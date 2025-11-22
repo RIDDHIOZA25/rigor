@@ -124,9 +124,9 @@ def run_agent_pipeline(chat_id: str, task_id: str, user_message: str, session: S
 
         print(f"🧾 Structured data sent to CFO agent: {structured_data}")
 
-        update_status(chat_id, "computing_metrics", 40, "Processing data through Pathway pipeline")
+        update_status(chat_id, "computing_metrics", 40, "Processing data and computing financial metrics")
 
-        # 2️⃣ Compute Pathway-based metrics
+        # 2️⃣ Compute financial metrics
         analysis = finance_logic.analyze_financials(structured_data)
         metrics = analysis.get("summary", {})
         insights = analysis.get("insights", [])

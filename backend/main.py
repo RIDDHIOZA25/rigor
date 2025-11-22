@@ -8,9 +8,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import init_db, engine
 from sqlmodel import Session
 from routes import tasks, documents, chat, memo
-from services import pathway_client
 
-app = FastAPI(title="CFO Copilot Backend")
+app = FastAPI(title="RIGOR Backend")
 
 # Enable CORS for frontend
 app.add_middleware(
@@ -24,8 +23,6 @@ app.add_middleware(
 @app.on_event("startup")
 def on_startup():
     init_db()
-    # with Session(engine) as session:
-    #     pathway_client.rebuild_indexes_from_db(session)
 
 # Routes
 app.include_router(tasks.router, prefix="/tasks", tags=["Tasks"])

@@ -5,7 +5,7 @@ import { Analytics } from '@vercel/analytics/next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Diligent',
+  title: 'RIGOR',
   description: 'AI-Powered Due Diligence Agent',
   generator: 'v0.app',
 }

@@ -1,21 +1,30 @@
-import pathway as pw
+def safe_float(value):
+    """Convert string values like '5,000,000' or '$2M' into float safely."""
+    if value is None:
+        return 0.0
+    try:
+        # Remove commas, dollar signs, and whitespace
+        cleaned = str(value).replace(",", "").replace("$", "").strip()
+        if not cleaned:
+            return 0.0
+        return float(cleaned)
+    except (ValueError, TypeError):
+        return 0.0
 
 
-# 🧩 Define a schema that matches normalized ADE data
-class AdeSchema(pw.Schema):
-    company: str
-    revenue: float
-    debt: float
-    equity: float
-    cash_flow: float
-    net_income: float
-    ebitda: float
-    operating_income: float
+def safe_divide(numerator, denominator, default=0.0):
+    """Safely divide two numbers, returning default if denominator is zero."""
+    if denominator == 0 or denominator is None:
+        return default
+    try:
+        return float(numerator) / float(denominator)
+    except (ValueError, TypeError, ZeroDivisionError):
+        return default
 
 
 def process_ade_data(ade_json):
     """
-    Converts ADE JSON (single or list) into a Pathway table,
+    Converts ADE JSON (single or list) into normalized financial data,
     computes key financial metrics, and returns clean JSON-safe results.
     Handles variations in field names and ensures schema correctness.
     """
@@ -48,74 +57,52 @@ def process_ade_data(ade_json):
             key = "company"
         normalized[key] = v
 
-    # 2️⃣ Ensure all required keys exist
+    # 2️⃣ Ensure all required keys exist and convert to floats
     for key in [
         "company", "revenue", "debt", "equity",
         "cash_flow", "net_income", "ebitda", "operating_income"
     ]:
-        normalized.setdefault(key, 0)
-
-    # 3️⃣ Build table from rows using AdeSchema
-    ade_table = pw.debug.table_from_rows(
-        rows=[(
-            normalized["company"],
-            float(str(normalized["revenue"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["debt"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["equity"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["cash_flow"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["net_income"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["ebitda"]).replace(",", "").replace("$", "") or 0),
-            float(str(normalized["operating_income"]).replace(",", "").replace("$", "") or 0),
-        )],
-        schema=AdeSchema
-    )
-
-    # 4️⃣ Compute derived metrics
-    processed = ade_table.select(
-        company=pw.this.company,
-        revenue=pw.this.revenue,
-        debt=pw.this.debt,
-        equity=pw.this.equity,
-        cash_flow=pw.this.cash_flow,
-        net_income=pw.this.net_income,
-        ebitda=pw.this.ebitda,
-        operating_income=pw.this.operating_income,
-        debt_to_equity=pw.coalesce(pw.this.debt / pw.this.equity, 0.0),
-        debt_to_revenue=pw.coalesce(pw.this.debt / pw.this.revenue, 0.0),
-        net_margin=pw.coalesce(pw.this.net_income / pw.this.revenue, 0.0),
-        return_on_equity=pw.coalesce(pw.this.net_income / pw.this.equity, 0.0),
-        cashflow_to_debt=pw.coalesce(pw.this.cash_flow / pw.this.debt, 0.0),
-    )
-
-    # 5️⃣ Convert to list of dicts (materialize Pathway output)
-    raw_result = list(pw.debug.table_to_dicts(processed))
-
-    # 6️⃣ Flatten if nested list and clean materialized output
-    flattened = []
-    for row in raw_result:
-        if isinstance(row, list):  # e.g., [[{...}]]
-            flattened.extend(row)
+        if key not in normalized:
+            normalized[key] = 0 if key != "company" else ""
+        elif key != "company":
+            normalized[key] = safe_float(normalized[key])
         else:
-            flattened.append(row)
+            # Keep company as string
+            normalized[key] = str(normalized[key] or "")
 
-    clean_result = []
-    for row in flattened:
-        if not isinstance(row, dict):
-            continue
-        clean_row = {}
-        for k, v in row.items():
-            try:
-                # Convert lazy Pathway pointers or complex objects to floats/strings
-                if hasattr(v, "value") or "pathway.engine" in str(type(v)):
-                    clean_row[k] = float(str(v))
-                elif isinstance(v, (float, int)):
-                    clean_row[k] = v
-                else:
-                    val_str = str(v).replace(",", "").replace("$", "").strip()
-                    clean_row[k] = float(val_str) if val_str.replace('.', '', 1).isdigit() else val_str
-            except Exception:
-                clean_row[k] = str(v)
-        clean_result.append(clean_row)
+    # 3️⃣ Extract normalized values
+    company = normalized["company"]
+    revenue = normalized["revenue"]
+    debt = normalized["debt"]
+    equity = normalized["equity"]
+    cash_flow = normalized["cash_flow"]
+    net_income = normalized["net_income"]
+    ebitda = normalized["ebitda"]
+    operating_income = normalized["operating_income"]
 
-    print("✅ Pathway processed ADE data (flattened + cleaned):", clean_result)
+    # 4️⃣ Compute derived metrics with safe division
+    debt_to_equity = safe_divide(debt, equity)
+    debt_to_revenue = safe_divide(debt, revenue)
+    net_margin = safe_divide(net_income, revenue)
+    return_on_equity = safe_divide(net_income, equity)
+    cashflow_to_debt = safe_divide(cash_flow, debt)
+
+    # 5️⃣ Build clean result dictionary
+    clean_result = [{
+        "company": company,
+        "revenue": revenue,
+        "debt": debt,
+        "equity": equity,
+        "cash_flow": cash_flow,
+        "net_income": net_income,
+        "ebitda": ebitda,
+        "operating_income": operating_income,
+        "debt_to_equity": debt_to_equity,
+        "debt_to_revenue": debt_to_revenue,
+        "net_margin": net_margin,
+        "return_on_equity": return_on_equity,
+        "cashflow_to_debt": cashflow_to_debt,
+    }]
+
+    print("✅ Processed ADE data (normalized + computed metrics):", clean_result)
     return clean_result

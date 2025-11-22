@@ -13,14 +13,14 @@ def safe_float(value):
 def analyze_financials(ade_json):
     """
     CFO agent logic:
-    - Uses Pathway’s processed metrics
+    - Uses processed financial metrics
     - Computes additional ratios and financial insights
     - Always returns a JSON-safe dict with summary + insights
     """
     try:
         results = process_ade_data(ade_json)
     except Exception as e:
-        print(f"⚠️ Pathway processing failed: {e}")
+        print(f"⚠️ Financial data processing failed: {e}")
         return {"summary": {}, "insights": ["⚠️ Could not process ADE data."]}
 
     # 🧩 Normalize result type

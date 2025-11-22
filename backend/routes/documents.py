@@ -44,12 +44,12 @@ async def upload_document(
     print("📊 Categorized Data:", json.dumps(categorized_data, indent=2))
 
     # ---------------------------------------------------
-    # 🧩 4️⃣ Pathway pipeline: compute financial metrics
+    # 🧩 4️⃣ Compute financial metrics (normalize + calculate ratios)
     # ---------------------------------------------------
     metrics = pathway_client.process_ade_data(extraction_json)
 
     # ---------------------------------------------------
-    # 🧠 5️⃣ CFO logic (based on Pathway pipeline results)
+    # 🧠 5️⃣ CFO logic (based on computed metrics)
     # ---------------------------------------------------
     analysis = finance_logic.analyze_financials(extraction_json)
 

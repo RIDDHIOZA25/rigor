@@ -1,8 +1,8 @@
-# Diligent 🔍
+# RIGOR 🔍
 
 **AI-Powered M&A Due Diligence Assistant**
 
-Diligent assists deal teams by extracting structured data from financial documents, performing semantic search across datarooms, and providing AI-generated insights with full citations. Built for analysts who need fast document review with transparent, verifiable sources.
+RIGOR assists deal teams by extracting structured data from financial documents, performing semantic search across datarooms, and providing AI-generated insights with full citations. Built for analysts who need fast document review with transparent, verifiable sources.
 
 > **⚠️ Important:** This tool **assists** analysts—it does **not** replace human judgment or comprehensive due diligence. Every answer must be verified against the cited source documents. This is an analytical aid, not a decision-making system.
 

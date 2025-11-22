@@ -51,7 +51,7 @@ export function DataroomSidebar({ datarooms, selectedId, onSelect, onRefresh }: 
     <div className="w-80 border-r border-border bg-card flex flex-col">
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold text-foreground">Diligent</h1>
+          <h1 className="text-xl font-semibold text-foreground">RIGOR</h1>
         </div>
         <Button className="w-full" size="sm" onClick={() => setShowNewDialog(true)}>
           <Plus className="w-4 h-4 mr-2" />

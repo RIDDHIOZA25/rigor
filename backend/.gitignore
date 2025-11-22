@@ -29,3 +29,8 @@ myenv/
 Thumbs.db
 
 .venv
+
+# Generated files
+uploads/
+exports/
+*.db

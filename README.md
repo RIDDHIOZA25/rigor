@@ -10,9 +10,7 @@ RIGOR assists deal teams by extracting structured data from financial documents,
 
 ## 🎬 Demo
 
-[![Watch Demo](https://img.shields.io/badge/▶️-Watch%20Demo-red?style=for-the-badge&logo=youtube)](https://youtu.be/QfwF3Uh10PY)
-
-Note: Demo video includes all features as of October 5th, 2025
+https://youtu.be/nDRjAG48czo
 
 ---
 
